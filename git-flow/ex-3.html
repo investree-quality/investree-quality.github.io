@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/@gitgraph/js"></script>
+  </head>
+  <body>
+    <div id="graph-container"></div>
+    <script>
+      // Helpers
+      const toUpperCaseFirstLetter = function (text) {
+        var newText = text
+          .toLowerCase()
+          .replace(/(^\s*\w|[\.\!\?]\s*\w)/g, function (c) {
+            return c.toUpperCase();
+          });
+        return newText;
+      };
+
+      const generateCommitMsg = function (authorName, message) {
+        let result;
+        let subject = "[{x}] {y}"
+          .replace("{x}", authorName.toUpperCase())
+          .replace("{y}", message);
+        let author = "{x} <{y}@investree.id>"
+          .replace("{x}", toUpperCaseFirstLetter(authorName.toLowerCase()))
+          .replace("{y}", authorName.toLowerCase());
+
+        result = {
+          subject,
+          author,
+        };
+
+        if (!message) {
+          result = author;
+        }
+        return result;
+      };
+
+      // Git graph
+      const graphContainer = document.getElementById("graph-container");
+      const gitgraph = GitgraphJS.createGitgraph(graphContainer, {
+        author: generateCommitMsg("Angga"),
+      });
+
+      const master = gitgraph.branch("master");
+      master.commit(generateCommitMsg("Reyhan", "Initial commit"));
+
+      const tribeBiz = master.branch("feature/tribe-biz/sprint-10");
+      tribeBiz.commit(generateCommitMsg("Deddy", "Add partnership testcase"));
+
+      const multiplePartnerFeature = tribeBiz.branch(
+        "feature/multiple-partner"
+      );
+      multiplePartnerFeature
+        .commit(generateCommitMsg("Deddy", "Add Garuda registration tcs"))
+        .commit(generateCommitMsg("Deddy", "Add Inamart registration tcs"));
+
+      tribeBiz.merge(multiplePartnerFeature);
+
+      master.merge(tribeBiz);
+    </script>
+  </body>
+</html>
