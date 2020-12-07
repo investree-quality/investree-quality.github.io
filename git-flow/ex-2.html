@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/@gitgraph/js"></script>
+  </head>
+  <body>
+    <div id="graph-container"></div>
+    <script>
+      // Helpers
+      const toUpperCaseFirstLetter = function (text) {
+        var newText = text
+          .toLowerCase()
+          .replace(/(^\s*\w|[\.\!\?]\s*\w)/g, function (c) {
+            return c.toUpperCase();
+          });
+        return newText;
+      };
+
+      const generateCommitMsg = function (authorName, message) {
+        let result;
+        let subject = "[{x}] {y}"
+          .replace("{x}", authorName.toUpperCase())
+          .replace("{y}", message);
+        let author = "{x} <{y}@investree.id>"
+          .replace("{x}", toUpperCaseFirstLetter(authorName.toLowerCase()))
+          .replace("{y}", authorName.toLowerCase());
+
+        result = {
+          subject,
+          author,
+        };
+
+        if (!message) {
+          result = author;
+        }
+        return result;
+      };
+
+      // Git graph
+      const graphContainer = document.getElementById("graph-container");
+      const gitgraph = GitgraphJS.createGitgraph(graphContainer, {
+        author: generateCommitMsg("Angga"),
+      });
+
+      const master = gitgraph.branch("master");
+      master.commit(generateCommitMsg("Reyhan", "Initial commit"));
+
+      const sprint9 = master.branch("feature/tribe-biz/sprint-9");
+      sprint9.commit(generateCommitMsg("Deddy", "Add WCTL testcase"));
+
+      const sprint10 = sprint9.branch("feature/tribe-biz/sprint-10");
+      sprint10.commit(generateCommitMsg("Deddy", "Add partnership testcase"));
+    </script>
+  </body>
+</html>
